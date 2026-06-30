@@ -1,0 +1,88 @@
+# Site settings
+title: Biological Data Engineering
+description: "Course materials for Biological Data Engineering at Boston University — the infrastructure half of bioinformatics: modeling, storing, validating, moving, and stewarding biological data so downstream analysis is reproducible, trustworthy, and reusable."
+baseurl: "/bio-data-engineering" # the subpath of your site
+url: "https://bu-bioinfo.github.io" # the base hostname & protocol for your site
+email: ""
+
+theme: minimal-mistakes-jekyll
+
+# Build settings
+markdown: kramdown
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Collections
+collections:
+  lectures:
+    output: true
+    permalink: /lectures/:path/
+  labs:
+    output: true
+    permalink: /labs/:path/
+  guides:
+    output: true
+    permalink: /guides/:path/
+
+# Defaults
+defaults:
+  # _pages
+  - scope:
+      path: ""
+      type: pages
+    values:
+      layout: single
+      sidebar:
+        nav: "sidebar"
+      classes: wide
+
+  # _lectures
+  - scope:
+      path: ""
+      type: lectures
+    values:
+      layout: single
+      sidebar:
+        nav: "sidebar"
+      classes: wide
+
+  # _labs
+  - scope:
+      path: ""
+      type: labs
+    values:
+      layout: single
+      sidebar:
+        nav: "sidebar"
+      classes: wide
+      toc: true
+      toc_sticky: true
+
+  # _guides
+  - scope:
+      path: ""
+      type: guides
+    values:
+      layout: single
+      sidebar:
+        nav: "sidebar"
+      classes: wide
+      toc: true
+      toc_sticky: true
+
+# Site timezone
+timezone: America/New_York
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - README.md
+  - AI_DISCLOSURE.md
+  - .gitignore
+  - Dockerfile
+  - internal/

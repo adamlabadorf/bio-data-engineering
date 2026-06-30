@@ -1,0 +1,77 @@
+# Build and deploy the Jekyll site to GitHub Pages.
+#
+# The `build` job runs on every push to main and every pull request, in every
+# repo (forks included), as a pure compile check — it makes no GitHub Pages API
+# calls, so it works in a fork even if Pages is disabled there.
+#
+# The `deploy` job is guarded to the canonical upstream repository, so only it
+# publishes the site. Forks build but never deploy and never create their own
+# Pages site (so there's no confusing duplicate site for students).
+name: Build & deploy Jekyll site
+
+on:
+  # Build on pushes to main and validate every PR.
+  push:
+    branches: ["main"]
+  pull_request:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Build job — runs everywhere (forks + PRs) as a compile check.
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@4a9ddd6f338a97768b8006bf671dfbad383215f4
+        with:
+          ruby-version: '3.3'
+          bundler-cache: false
+          cache-version: 1
+      - name: Fix platform compatibility
+        run: |
+          bundle lock --add-platform x86_64-linux
+          bundle install
+      - name: Build with Jekyll
+        # baseurl matches _config.yml (the canonical /bio-data-engineering path).
+        # Hardcoded rather than read from actions/configure-pages, so this step
+        # makes no Pages API call and works in any fork without Pages enabled.
+        run: bundle exec jekyll build --baseurl "/bio-data-engineering"
+        env:
+          JEKYLL_ENV: production
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  # Deployment job — ONLY the canonical upstream repo publishes the site.
+  # On any fork this job is skipped (shown neutral, not failed), so forks get
+  # the build check above without deploying.
+  deploy:
+    if: github.repository == 'bu-bioinfo/bio-data-engineering' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    # Allow only one concurrent deployment; never cancel an in-progress
+    # production deploy. Scoped to this job so build checks don't serialize.
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+        with:
+          # Create the Pages site on first deploy so upstream needs no manual
+          # Settings → Pages step. Only ever runs on the upstream repo.
+          enablement: true
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
