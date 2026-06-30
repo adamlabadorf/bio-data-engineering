@@ -83,6 +83,7 @@ exclude:
   - vendor
   - README.md
   - AI_DISCLOSURE.md
+  - CONTRIBUTING.md
   - .gitignore
   - Dockerfile
   - internal/
