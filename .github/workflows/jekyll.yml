@@ -41,6 +41,10 @@ jobs:
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v5
+        with:
+          # Auto-create the Pages site if it doesn't exist yet, so every fork
+          # (and upstream) deploys without a manual Settings → Pages step.
+          enablement: true
       - name: Build with Jekyll
         run: bundle exec jekyll build --baseurl "${{ steps.pages.outputs.base_path }}"
         env:
